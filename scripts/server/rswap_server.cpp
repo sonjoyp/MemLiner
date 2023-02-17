@@ -9,6 +9,7 @@ int rdma_queue_count = 0;
 // Utilities functions
 inline enum rdma_queue_type get_qp_type(int idx)
 {
+	printf("Mem_Server---------:get_qp_type-------\n");
 	if (idx < ONLINE_CORES) {
 		return QP_SYNC;
 	} else if (idx < 2 * ONLINE_CORES) {
@@ -21,6 +22,7 @@ inline enum rdma_queue_type get_qp_type(int idx)
 
 inline struct rswap_rdma_queue *get_rdma_queue(unsigned int cpu, enum rdma_queue_type type)
 {
+	printf("Mem_Server---------:get_rdma_queue-------\n");
 	switch (type) {
 	case QP_SYNC:
 		return &global_rdma_ctx->rdma_queues[cpu];
@@ -52,13 +54,14 @@ inline struct rswap_rdma_queue *get_rdma_queue(unsigned int cpu, enum rdma_queue
  */
 int main(int argc, char *argv[])
 {
+	printf("Mem_Server---------:main-------\n");
 	struct sockaddr_in6 addr;
 	struct rdma_cm_event *event = NULL;
 	struct rdma_cm_id *listener = NULL;
 	struct rdma_event_channel *ec = NULL; // [x] Event channel, used for 2-sided RDMA. Get interrupes here.
 	uint16_t port = 0;
 
-	const char *ip_str = "memory.server.ib.ip";
+	const char *ip_str = "128.110.218.220";
 	const char *port_str = "9400";
 	fprintf(stderr, "%s, trying to bind to %s:%s.\n", __func__, ip_str, port_str);
 
@@ -130,6 +133,7 @@ int main(int argc, char *argv[])
  */
 void init_memory_pool(struct context *rdma_ctx)
 {
+	printf("Mem_Server---------:init_memory_pool-------\n");
 	int i;
 	rdma_ctx->mem_pool = (struct rdma_mem_pool *)calloc(1, sizeof(struct rdma_mem_pool));
 
@@ -193,6 +197,7 @@ void init_memory_pool(struct context *rdma_ctx)
  */
 int on_cm_event(struct rdma_cm_event *event)
 {
+	printf("Mem_Server---------:on_cm_event-------\n");
 	int r = 0;
 	struct rswap_rdma_queue *rdma_queue = (struct rswap_rdma_queue *)event->id->context; // if we pass on_connect_request, we can get a null queue.
 
@@ -222,6 +227,7 @@ int on_cm_event(struct rdma_cm_event *event)
  */
 int on_connect_request(struct rdma_cm_id *id)
 {
+	printf("Mem_Server---------:on_connect_request-------\n");
 	struct rdma_conn_param cm_params;
 	struct rswap_rdma_queue *rdma_queue;
 
@@ -258,6 +264,7 @@ int on_connect_request(struct rdma_cm_id *id)
  */
 void build_connection(struct rswap_rdma_queue *rdma_queue)
 {
+	printf("Mem_Server---------:build_connection-------\n");
 	//struct connection *conn;
 	struct ibv_qp_init_attr qp_attr;
 
@@ -290,6 +297,7 @@ void build_connection(struct rswap_rdma_queue *rdma_queue)
  */
 void get_device_info(struct rswap_rdma_queue *rdma_queue) // rdma_cm_id->verbs
 {
+	printf("Mem_Server---------:get_device_info-------\n");
 	// For multiple QP, only need to initialize global_rdma_ctx->rdma_dev once.
 	if (global_rdma_ctx->rdma_dev == NULL) {
 		global_rdma_ctx->rdma_dev = (struct rswap_rdma_dev *)calloc(1, sizeof(struct rswap_rdma_dev));
@@ -326,6 +334,7 @@ void get_device_info(struct rswap_rdma_queue *rdma_queue) // rdma_cm_id->verbs
  */
 void build_qp_attr(struct rswap_rdma_queue *rdma_queue, struct ibv_qp_init_attr *qp_attr)
 {
+	printf("Mem_Server---------:build_qp_attr-------\n");
 	memset(qp_attr, 0, sizeof(*qp_attr));
 
 	qp_attr->send_cq = rdma_queue->cq; // Only the first rdma_queue has a solid cq. Other are NULL.
@@ -347,6 +356,7 @@ void build_qp_attr(struct rswap_rdma_queue *rdma_queue, struct ibv_qp_init_attr 
  */
 void *poll_cq(void *ctx)
 {
+	printf("Mem_Server---------:poll_cq-------\n");
 	struct ibv_cq *cq; // 2-sided, completion queue, retrieve receive_wr hre.
 	struct ibv_wc wc;  //
 
@@ -369,6 +379,7 @@ void *poll_cq(void *ctx)
  */
 void register_rdma_comm_buffer(struct context *rdma_session)
 {
+	printf("Mem_Server---------:register_rdma_comm_buffer-------\n");
 	rdma_session->send_msg = (struct message *)calloc(1, sizeof(struct message)); // 2-sided RDMA messages
 	rdma_session->recv_msg = (struct message *)calloc(1, sizeof(struct message));
 
@@ -394,6 +405,7 @@ void register_rdma_comm_buffer(struct context *rdma_session)
  */
 void post_receives(struct rswap_rdma_queue *rdma_queue)
 {
+	printf("Mem_Server---------:post_receives-------\n");
 	struct ibv_recv_wr wr, *bad_wr = NULL;
 	struct ibv_sge sge;
 	struct context *rdma_session = rdma_queue->rdma_session;
@@ -415,6 +427,7 @@ void post_receives(struct rswap_rdma_queue *rdma_queue)
 //
 void build_params(struct rdma_conn_param *params)
 {
+	printf("Mem_Server---------:build_params-------\n");
 	memset(params, 0, sizeof(*params));
 
 	params->initiator_depth = params->responder_resources = 1;
@@ -442,6 +455,7 @@ void build_params(struct rdma_conn_param *params)
  */
 void handle_cqe(struct ibv_wc *wc)
 {
+	printf("Mem_Server---------:handle_cqe-------\n");
 	// wc->wr_id is a reserved viod* pointer for any self-attached context.
 	// context->recv_msg is the binded DMA buffer.
 	struct rswap_rdma_queue *rdma_queue = (struct rswap_rdma_queue *)(uintptr_t)wc->wr_id;
@@ -498,6 +512,7 @@ void handle_cqe(struct ibv_wc *wc)
  */
 int rdma_connected(struct rswap_rdma_queue *rdma_queue)
 {
+	printf("Mem_Server---------:rdma_connected-------\n");
 	int i;
 	int ret = 0;
 	bool succ = true;
@@ -571,6 +586,7 @@ err:
  */
 void inform_memory_pool_available(struct rswap_rdma_queue *rdma_queue)
 {
+	printf("Mem_Server---------:inform_memory_pool_available-------\n");
 
 	rdma_queue->rdma_session->send_msg->type = AVAILABLE_TO_QUERY;
 	fprintf(stderr, "%s , rdma_queue [%d] Informa CPU server that memory server is prepared well for serving.\n", __func__, rdma_queue->q_index);
@@ -589,6 +605,7 @@ void inform_memory_pool_available(struct rswap_rdma_queue *rdma_queue)
  */
 void send_free_mem_size(struct rswap_rdma_queue *rdma_queue)
 {
+	printf("Mem_Server---------:send_free_mem_size-------\n");
 	int i;
 	struct context *rdma_session = rdma_queue->rdma_session;
 
@@ -614,6 +631,7 @@ void send_free_mem_size(struct rswap_rdma_queue *rdma_queue)
  */
 void send_regions(struct rswap_rdma_queue *rdma_queue)
 {
+	printf("Mem_Server---------:send_regions-------\n");
 	int i;
 	struct context *rdma_session = rdma_queue->rdma_session;
 
@@ -639,6 +657,7 @@ void send_regions(struct rswap_rdma_queue *rdma_queue)
  */
 void send_message(struct rswap_rdma_queue *rdma_queue)
 {
+	printf("Mem_Server---------:send_message-------\n");
 	struct ibv_send_wr wr, *bad_wr = NULL;
 	struct ibv_sge sge;
 	struct context *rdma_session = rdma_queue->rdma_session;
@@ -678,6 +697,7 @@ void send_message(struct rswap_rdma_queue *rdma_queue)
  */
 int on_disconnect(struct rswap_rdma_queue *rdma_queue)
 {
+	printf("Mem_Server---------:on_disconnect-------\n");
 	if (rdma_queue->connected == 1) {
 		rdma_destroy_qp(rdma_queue->cm_id);
 		rdma_destroy_id(rdma_queue->cm_id);
@@ -699,6 +719,7 @@ int on_disconnect(struct rswap_rdma_queue *rdma_queue)
  */
 void destroy_connection(struct context *rdma_session)
 {
+	printf("Mem_Server---------:destroy_connection-------\n");
 	int i = 0;
 
 	ibv_dereg_mr(rdma_session->send_mr);
@@ -734,6 +755,7 @@ void destroy_connection(struct context *rdma_session)
 
 void die(const char *reason)
 {
+	printf("Mem_Server---------:die-------\n");
 	fprintf(stderr, "ERROR, %s\n", reason);
 	exit(EXIT_FAILURE);
 }

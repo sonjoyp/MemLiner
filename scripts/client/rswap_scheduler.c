@@ -12,6 +12,7 @@ struct rswap_scheduler *global_rswap_scheduler = NULL;
 
 int rswap_vqueue_init(struct rswap_vqueue *vqueue)
 {
+	pr_info("CPU_Server---------:rswap_vqueue_init------\n");
 	if (!vqueue) {
 		return -EINVAL;
 	}
@@ -37,6 +38,7 @@ int rswap_vqueue_init(struct rswap_vqueue *vqueue)
 
 int rswap_vqueue_enqueue(struct rswap_vqueue *vqueue, struct rswap_request *request)
 {
+	pr_info("CPU_Server---------:rswap_vqueue_enqueue------\n");
 	unsigned long flags;
 	int cnt;
 	if (!vqueue || !request) {
@@ -99,6 +101,7 @@ int rswap_vqueue_enqueue(struct rswap_vqueue *vqueue, struct rswap_request *requ
 
 int rswap_vqueue_dequeue(struct rswap_vqueue *vqueue, struct rswap_request *request)
 {
+	pr_info("CPU_Server---------:rswap_vqueue_dequeue------\n");
 	unsigned long flags;
 	int cnt;
 	if (!vqueue || !request) {
@@ -129,6 +132,7 @@ int rswap_vqueue_dequeue(struct rswap_vqueue *vqueue, struct rswap_request *requ
 
 int rswap_vqueue_drain(struct rswap_vqueue *vqueue)
 {
+	pr_info("CPU_Server---------:rswap_vqueue_drain------\n");
 	while (atomic_read(&vqueue->cnt) > 0) {
 		cpu_relax();
 	}
@@ -137,6 +141,7 @@ int rswap_vqueue_drain(struct rswap_vqueue *vqueue)
 
 int rswap_vqueue_list_init(void)
 {
+	pr_info("CPU_Server---------:rswap_vqueue_list_init------\n");
 	struct rswap_vqueue_list *vqlist;
 
 	if (!global_rswap_vqueue_list) {
@@ -160,6 +165,7 @@ int rswap_vqueue_list_init(void)
 
 struct rswap_vqueue *rswap_vqueue_list_get(struct rswap_vqueue_list *vqlist, int qid)
 {
+	pr_info("CPU_Server---------:rswap_vqueue_list_get------\n");
 	unsigned long flags;
 	struct rswap_vqueue *pos, *tmp;
 
@@ -188,6 +194,7 @@ struct rswap_vqueue *rswap_vqueue_list_get(struct rswap_vqueue_list *vqlist, int
 
 int rswap_vqueue_list_add(struct rswap_vqueue_list *vqlist, struct rswap_vqueue *vqueue)
 {
+	pr_info("CPU_Server---------:rswap_vqueue_list_add------\n");
 	unsigned long flags;
 	if (!vqlist || !vqueue) {
 		return -EINVAL;
@@ -207,6 +214,7 @@ int rswap_vqueue_list_add(struct rswap_vqueue_list *vqlist, struct rswap_vqueue 
 }
 int rswap_vqueue_list_del(struct rswap_vqueue_list *vqlist, struct rswap_vqueue *vqueue)
 {
+	pr_info("CPU_Server---------:rswap_vqueue_list_del------\n");
 	unsigned long flags;
 	if (!vqlist || !vqueue) {
 		return -EINVAL;
@@ -222,6 +230,7 @@ int rswap_vqueue_list_del(struct rswap_vqueue_list *vqlist, struct rswap_vqueue 
 
 int rswap_register_virtual_queue(struct rswap_vqueue_list *vqlist, int *qid)
 {
+	pr_info("CPU_Server---------:rswap_register_virtual_queue------\n");
 	int ret = 0;
 	struct rswap_vqueue *vqueue;
 	if (!vqlist || !qid) {
@@ -242,6 +251,7 @@ int rswap_register_virtual_queue(struct rswap_vqueue_list *vqlist, int *qid)
 
 int rswap_unregister_virtual_queue(struct rswap_vqueue_list *vqlist, int qid)
 {
+	pr_info("CPU_Server---------:rswap_unregister_virtual_queue------\n");
 	int ret = 0;
 	struct rswap_vqueue *vqueue;
 	if (!vqlist || qid < 0 || qid >= vqlist->max_id) {
@@ -257,6 +267,7 @@ int rswap_unregister_virtual_queue(struct rswap_vqueue_list *vqlist, int qid)
 
 int rswap_scheduler_init(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:rswap_scheduler_init------\n");
 	int ret = 0;
 	int fake_qid;
 	const int online_cores = num_online_cpus();
@@ -300,6 +311,7 @@ cleanup:
 
 int rswap_scheduler_stop(void)
 {
+	pr_info("CPU_Server---------:rswap_scheduler_stop------\n");
 	int ret = 0;
 	if (!global_rswap_scheduler) {
 		return -EINVAL;
@@ -311,6 +323,7 @@ int rswap_scheduler_stop(void)
 
 int rswap_scheduler_thread(void *args)
 {
+	pr_info("CPU_Server---------:rswap_scheduler_thread------\n");
 	struct rswap_vqueue_list *vqlist;
 	struct rdma_session_context *rdma_session;
 	const unsigned online_cores = num_online_cpus();

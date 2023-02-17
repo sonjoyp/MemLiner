@@ -8,6 +8,7 @@ static void *local_dram; // a buffer created via vzalloc
 
 int rswap_dram_write(struct page *page, size_t roffset)
 {
+	pr_info("CPU_Server---------:rswap_dram_write------\n");
 	void *page_vaddr;
 
 	page_vaddr = kmap_atomic(page); // map the physical page to a virtual address
@@ -18,6 +19,7 @@ int rswap_dram_write(struct page *page, size_t roffset)
 
 int rswap_dram_read(struct page *page, size_t roffset)
 {
+	pr_info("CPU_Server---------:rswap_dram_read------\n");
 	void *page_vaddr;
 
 	VM_BUG_ON_PAGE(!PageSwapCache(page), page);
@@ -39,6 +41,7 @@ int rswap_dram_read(struct page *page, size_t roffset)
  */
 int rswap_init_local_dram(void)
 {
+	pr_info("CPU_Server---------:rswap_init_local_dram------\n");
 	local_dram = vzalloc(REMOTE_BUF_SIZE);
 	pr_info("Allocate local dram 0x%lx bytes for debug\n", REMOTE_BUF_SIZE);
 	return 0;
@@ -46,6 +49,7 @@ int rswap_init_local_dram(void)
 
 int rswap_remove_local_dram(void)
 {
+	pr_info("CPU_Server---------:rswap_remove_local_dram------\n");
 	vfree(local_dram);
 	pr_info("Free the allocated local_dram 0x%lx bytes \n", REMOTE_BUF_SIZE);
 	return 0;

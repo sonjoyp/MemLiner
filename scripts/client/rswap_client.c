@@ -8,6 +8,7 @@ MODULE_VERSION("1.0");
 // invoked by insmod
 int __init rswap_cpu_init(void)
 {
+	pr_info("CPU_Server---------:rswap_cpu_init------\n");
 	int ret = 0;
 #ifdef RSWAP_FRONTSWAP_RDMA
 	ret = rswap_rdma_client_init();
@@ -26,6 +27,7 @@ out:
 // invoked by rmmod
 void __exit rswap_cpu_exit(void)
 {
+	pr_info("CPU_Server---------:rswap_cpu_exit------\n");
 	printk(" Prepare to remove the CPU Server module.\n");
 #ifdef RSWAP_FRONTSWAP_RDMA
 	rswap_rdma_client_exit();

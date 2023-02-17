@@ -43,6 +43,7 @@ u64 cq_get_count = 0;
 
 // Utilities functions
 inline enum rdma_queue_type get_qp_type(int idx) {
+	pr_info("CPU_Server---------:get_qp_type------\n");
 	if (idx < online_cores) {
 		return QP_SYNC;
 	} else if (idx < 2 * online_cores) {
@@ -56,6 +57,7 @@ inline enum rdma_queue_type get_qp_type(int idx) {
 inline struct rswap_rdma_queue *get_rdma_queue(struct rdma_session_context *rdma_session,
 					       unsigned int cpu, enum rdma_queue_type type)
 {
+	pr_info("CPU_Server---------:get_rdma_queue------\n");
 	switch (type) {
 	case QP_SYNC:
 		return &(rdma_session->rdma_queues[cpu]);
@@ -87,6 +89,7 @@ inline struct rswap_rdma_queue *get_rdma_queue(struct rdma_session_context *rdma
  */
 int handle_recv_wr(struct rswap_rdma_queue *rdma_queue, struct ib_wc *wc)
 {
+	pr_info("CPU_Server---------:handle_recv_wr------\n");
 	int ret = 0;
 	struct rdma_session_context *rdma_session = rdma_queue->rdma_session;
 
@@ -149,6 +152,7 @@ out:
  */
 void two_sided_message_done(struct ib_cq *cq, struct ib_wc *wc)
 {
+	pr_info("CPU_Server---------:two_sided_message_done------\n");
 	struct rswap_rdma_queue *rdma_queue = cq->cq_context;
 	int ret = 0;
 
@@ -192,6 +196,7 @@ out:
  */
 int send_message_to_remote(struct rdma_session_context *rdma_session, int rdma_queue_ind, int messge_type, int chunk_num)
 {
+	pr_info("CPU_Server---------:send_message_to_remote------\n");
 	int ret = 0;
 	const struct ib_recv_wr *recv_bad_wr;
 	const struct ib_send_wr *send_bad_wr;
@@ -228,6 +233,7 @@ err:
  */
 int rswap_query_available_memory(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:rswap_query_available_memory------\n");
 	int ret = 0;
 	struct rswap_rdma_queue *rdma_queue;
 
@@ -269,6 +275,7 @@ err:
  */
 int rswap_request_for_chunk(struct rdma_session_context *rdma_session, int num_chunk)
 {
+	pr_info("CPU_Server---------:rswap_request_for_chunk------\n");
 	int ret = 0;
 	struct rswap_rdma_queue *rdma_queue;
 
@@ -316,6 +323,7 @@ err:
  */
 int rswap_rdma_cm_event_handler(struct rdma_cm_id *cma_id, struct rdma_cm_event *event)
 {
+	pr_info("CPU_Server---------:rswap_rdma_cm_event_handler------\n");
 	int ret = 0;
 	struct rswap_rdma_queue *rdma_queue = cma_id->context;
 
@@ -407,6 +415,7 @@ int rswap_rdma_cm_event_handler(struct rdma_cm_id *cma_id, struct rdma_cm_event 
 //
 static int rdma_resolve_ip_to_ib_device(struct rdma_session_context *rdma_session, struct rswap_rdma_queue *rdma_queue)
 {
+	pr_info("CPU_Server---------:rdma_resolve_ip_to_ib_device------\n");
 	int ret;
 	struct sockaddr_storage sin;
 	struct sockaddr_in *sin4 = (struct sockaddr_in *)&sin;
@@ -444,6 +453,7 @@ static int rdma_resolve_ip_to_ib_device(struct rdma_session_context *rdma_sessio
  */
 int rswap_create_qp(struct rdma_session_context *rdma_session, struct rswap_rdma_queue *rdma_queue)
 {
+	pr_info("CPU_Server---------:rswap_create_qp------\n");
 	struct ib_qp_init_attr init_attr;
 	int ret;
 
@@ -475,6 +485,7 @@ int rswap_create_qp(struct rdma_session_context *rdma_session, struct rswap_rdma
 // Create Queue Pair : pd, cq, qp,
 int rswap_create_rdma_queue(struct rdma_session_context *rdma_session, int rdma_queue_index)
 {
+	pr_info("CPU_Server---------:rswap_create_rdma_queue------\n");
 	int ret = 0;
 	struct rdma_cm_id *cm_id;
 	struct rswap_rdma_queue *rdma_queue;
@@ -542,6 +553,7 @@ err:
  */
 void rswap_setup_message_wr(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:rswap_setup_message_wr------\n");
 	// 1) Reserve a wr for 2-sided RDMA recieve wr
 	rdma_session->rdma_recv_req.recv_sgl.addr = rdma_session->rdma_recv_req.recv_dma_addr; // sg entry addr
 	rdma_session->rdma_recv_req.recv_sgl.length = sizeof(struct message);		       // address of the length
@@ -581,6 +593,7 @@ void rswap_setup_message_wr(struct rdma_session_context *rdma_session)
  */
 int rswap_setup_buffers(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:rswap_setup_buffers------\n");
 	int ret = 0;
 
 	// 1) Allocate some DMA buffers.
@@ -616,6 +629,7 @@ int rswap_setup_buffers(struct rdma_session_context *rdma_session)
  */
 int rswap_connect_remote_memory_server(struct rdma_session_context *rdma_session, int rdma_queue_inx)
 {
+	pr_info("CPU_Server---------:rswap_connect_remote_memory_server------\n");
 	struct rdma_conn_param conn_param;
 	int ret;
 	struct rswap_rdma_queue *rdma_queue;
@@ -695,6 +709,7 @@ err:
  */
 int init_remote_chunk_list(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:init_remote_chunk_list------\n");
 	int ret = 0;
 	uint32_t i;
 
@@ -730,6 +745,7 @@ int init_remote_chunk_list(struct rdma_session_context *rdma_session)
  */
 void bind_remote_memory_chunks(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:bind_remote_memory_chunks------\n");
 	int i;
 	uint32_t *chunk_ptr;
 
@@ -779,8 +795,9 @@ void bind_remote_memory_chunks(struct rdma_session_context *rdma_session)
  */
 int init_rdma_sessions(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:init_rdma_sessions------\n");
 	int ret = 0;
-	char ip[] = "10.0.0.4"; // the memory server ip
+	char ip[] = "128.110.218.220"; // the memory server ip
 	uint16_t port = 9400;
 
 	// 1) RDMA queue information
@@ -811,6 +828,7 @@ err:
  */
 int setup_rdma_session_comm_buffer(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:setup_rdma_session_comm_buffer------\n");
 	int ret = 0;
 
 	if (rdma_session->rdma_dev == NULL) {
@@ -835,6 +853,7 @@ err:
  */
 int rswap_init_rdma_queue(struct rdma_session_context *rdma_session, int idx)
 {
+	pr_info("CPU_Server---------:rswap_init_rdma_queue------\n");
 	int ret = 0;
 	struct rswap_rdma_queue *rdma_queue = &(rdma_session->rdma_queues[idx]);
 
@@ -887,6 +906,7 @@ err:
  */
 int rdma_session_connect(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:rdma_session_connect------\n");
 	int ret;
 	int i;
 
@@ -979,6 +999,7 @@ err:
  */
 void rswap_free_buffers(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:rswap_free_buffers------\n");
 	// Free the DMA buffer for 2-sided RDMA messages
 	if (rdma_session == NULL)
 		return;
@@ -1006,6 +1027,7 @@ void rswap_free_buffers(struct rdma_session_context *rdma_session)
  */
 void rswap_free_rdma_structure(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:rswap_free_rdma_structure------\n");
 	struct rswap_rdma_queue *rdma_queue;
 	int i;
 
@@ -1053,6 +1075,7 @@ void rswap_free_rdma_structure(struct rdma_session_context *rdma_session)
  */
 int rswap_disconnect_and_collect_resource(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server---------:rswap_disconnect_and_collect_resource------\n");
 	int ret = 0;
 	int i;
 	struct rswap_rdma_queue *rdma_queue;
@@ -1113,6 +1136,7 @@ err:
 // invoked by insmod
 int rswap_rdma_client_init(void)
 {
+	pr_info("CPU_Server---------:rswap_rdma_client_init------\n");
 	int ret = 0;
 	printk(KERN_INFO "%s, start \n", __func__);
 
@@ -1145,6 +1169,7 @@ out:
 // invoked by rmmod
 void rswap_rdma_client_exit(void)
 {
+	pr_info("CPU_Server---------:rswap_rdma_client_exit------\n");
 	int ret = 0;
 
 	ret = rswap_disconnect_and_collect_resource(&rdma_session_global);
@@ -1300,6 +1325,7 @@ char *rdma_session_context_state_print(int id)
  */
 void print_scatterlist_info(struct scatterlist *sl_ptr, int nents)
 {
+	pr_info("CPU_Server---------:print_scatterlist_info------\n");
 	int i;
 
 	printk(KERN_INFO "\n %s, %d entries , Start\n", __func__, nents);

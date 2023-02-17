@@ -12,6 +12,7 @@
  */
 void drain_rdma_queue(struct rswap_rdma_queue *rdma_queue)
 {
+	pr_info("CPU_Server---------:drain_rdma_queue------\n");
 	unsigned long flags;
 
 	while (atomic_read(&rdma_queue->rdma_post_counter) > 0) { // [?] not disable preempt, other threads may keep enqueuing request into the rdma_queue ?
@@ -31,6 +32,7 @@ void drain_rdma_queue(struct rswap_rdma_queue *rdma_queue)
  */
 void drain_all_rdma_queues(int target_mem_server)
 {
+	pr_info("CPU_Server---------:drain_all_rdma_queues------\n");
 	int i;
 	struct rdma_session_context *rdma_session = &rdma_session_global;
 
@@ -45,6 +47,7 @@ void drain_all_rdma_queues(int target_mem_server)
  */
 void fs_rdma_write_done(struct ib_cq *cq, struct ib_wc *wc)
 {
+	pr_info("CPU_Server---------:fs_rdma_write_done------\n");
 	// get the instance start address of fs_rdma_req, whose filed, fs_rdma_req->cqe is pointed by wc->wr_cqe
 	struct fs_rdma_req *rdma_req = container_of(wc->wr_cqe, struct fs_rdma_req, cqe);
 	struct rswap_rdma_queue *rdma_queue = cq->cq_context;
@@ -62,6 +65,7 @@ void fs_rdma_write_done(struct ib_cq *cq, struct ib_wc *wc)
 
 void fs_rdma_read_done(struct ib_cq *cq, struct ib_wc *wc)
 {
+	pr_info("CPU_Server---------:fs_rdma_read_done------\n");
 	// get the instance start address of fs_rdma_req, whose filed, fs_rdma_req->cqe is pointed by wc->wr_cqe
 	struct fs_rdma_req *rdma_req = container_of(wc->wr_cqe, struct fs_rdma_req, cqe);
 	struct rswap_rdma_queue *rdma_queue = cq->cq_context;
@@ -103,6 +107,7 @@ void fs_rdma_read_done(struct ib_cq *cq, struct ib_wc *wc)
  */
 int fs_enqueue_send_wr(struct rdma_session_context *rdma_session, struct rswap_rdma_queue *rdma_queue, struct fs_rdma_req *rdma_req)
 {
+	pr_info("CPU_Server---------:fs_enqueue_send_wr------\n");
 	int ret = 0;
 	const struct ib_send_wr *bad_wr;
 	int test;
@@ -149,6 +154,7 @@ err:
 int fs_build_rdma_wr(struct rdma_session_context *rdma_session, struct rswap_rdma_queue *rdma_queue, struct fs_rdma_req *rdma_req,
 			struct remote_mapping_chunk *remote_chunk_ptr, size_t offset_within_chunk, struct page *page, enum dma_data_direction dir)
 {
+	pr_info("CPU_Server---------:fs_build_rdma_wr------\n");
 
 	int ret = 0;
 	struct ib_device *dev = rdma_session->rdma_dev->dev;
@@ -208,6 +214,7 @@ out:
 int fs_rdma_send(struct rdma_session_context *rdma_session, struct rswap_rdma_queue *rdma_queue, struct fs_rdma_req *rdma_req,
 			struct remote_mapping_chunk *remote_chunk_ptr, size_t offset_within_chunk, struct page *page, enum dma_data_direction dir)
 {
+	pr_info("CPU_Server---------:fs_rdma_send------\n");
 
 	int ret = 0;
 
@@ -255,6 +262,7 @@ out:
  */
 int rswap_frontswap_store(unsigned type, pgoff_t swap_entry_offset, struct page *page)
 {
+	pr_info("CPU_Server---------:rswap_frontswap_store------\n");
 #ifdef ENABLE_VQUEUE
 	int ret = 0;
 	int cpu = -1;
@@ -367,6 +375,7 @@ out:
  */
 int rswap_frontswap_load(unsigned type, pgoff_t swap_entry_offset, struct page *page)
 {
+	pr_info("CPU_Server---------:rswap_frontswap_load------\n");
 #ifdef ENABLE_VQUEUE
 	int ret = 0;
 	int cpu = -1;
@@ -460,6 +469,7 @@ out:
 
 int rswap_frontswap_load_async(unsigned type, pgoff_t swap_entry_offset, struct page *page)
 {
+	pr_info("CPU_Server---------:rswap_frontswap_load_async------\n");
 #ifdef ENABLE_VQUEUE
 	int ret = 0;
 	int cpu = -1;
@@ -548,6 +558,7 @@ out:
 
 int rswap_frontswap_poll_load(int cpu)
 {
+	pr_info("CPU_Server---------:rswap_frontswap_poll_load------\n");
 #ifdef ENABLE_VQUEUE
 	struct rswap_vqueue *vqueue;
 	struct rswap_rdma_queue *rdma_queue;
@@ -569,6 +580,7 @@ int rswap_frontswap_poll_load(int cpu)
 
 static void rswap_invalidate_page(unsigned type, pgoff_t offset)
 {
+	pr_info("CPU_Server---------:rswap_invalidate_page------\n");
 #ifdef DEBUG_MODE_DETAIL
 	pr_info("%s, remove page_virt addr 0x%lx\n", __func__, offset << PAGE_OFFSET);
 #endif
@@ -581,6 +593,7 @@ static void rswap_invalidate_page(unsigned type, pgoff_t offset)
  */
 static void rswap_invalidate_area(unsigned type)
 {
+	pr_info("CPU_Server---------:rswap_invalidate_area------\n");
 #ifdef DEBUG_MODE_DETAIL
 	pr_warn("%s, remove the pages of area 0x%x ?\n", __func__, type);
 #endif
@@ -589,6 +602,7 @@ static void rswap_invalidate_area(unsigned type)
 
 static void rswap_frontswap_init(unsigned type)
 {
+	pr_info("CPU_Server---------:rswap_frontswap_init------\n");
 #ifdef ENABLE_VQUEUE
 	int ret;
 	ret = rswap_scheduler_init(&rdma_session_global);
@@ -610,6 +624,7 @@ static struct frontswap_ops rswap_frontswap_ops = {
 
 int rswap_register_frontswap(void)
 {
+	pr_info("CPU_Server---------:rswap_register_frontswap------\n");
 	frontswap_register_ops(&rswap_frontswap_ops); // will enable the frontswap path
 
 #ifdef DEBUG_FRONTSWAP_ONLY
@@ -622,6 +637,7 @@ int rswap_register_frontswap(void)
 
 void rswap_deregister_frontswap(void)
 {
+	pr_info("CPU_Server---------:rswap_deregister_frontswap------\n");
 #ifdef DEBUG_FRONTSWAP_ONLY
 	rswap_remove_local_dram();
 #endif
