@@ -8,7 +8,7 @@ sudo resize2fs /dev/sda1
 #git clone https://github.com/uclasystem/MemLiner.git
 
 # Build and Install Kernel
-cd MemLiner/Kernel
+cd ~/MemLiner/Kernel
 # In case new kernel options are prompted, press enter to use the default options.
 echo "-----------------Kernel Build Started----------------------"
 echo Y | sudo ./build_kernel.sh build

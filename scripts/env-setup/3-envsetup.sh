@@ -1,6 +1,7 @@
 #! /bin/bash
 # Script 3
 # Download the MLNX OFED driver for the Ubuntu 18.04
+cd ~
 wget https://content.mellanox.com/ofed/MLNX_OFED-4.9-2.2.4.0/MLNX_OFED_LINUX-4.9-2.2.4.0-ubuntu18.04-x86_64.tgz
 tar xzf MLNX_OFED_LINUX-4.9-2.2.4.0-ubuntu18.04-x86_64.tgz
 cd MLNX_OFED_LINUX-4.9-2.2.4.0-ubuntu18.04-x86_64
