@@ -6,13 +6,13 @@ OS_DISTRO=$( awk -F= '/^NAME/{print $2}' /etc/os-release | sed -e 's/^"//' -e 's
 echo "$OS_DISTRO"
 
 # The swap file/partition size should be equal to the whole size of remote memory
-SWAP_PARTITION_SIZE="48G"
+SWAP_PARTITION_SIZE="12G"
 
 # Cause of sudo, NOT use ${HOME}
 
 if [ -z "$HOME" ]
 then
-    home_dir="/home/haoran"
+    home_dir="/users/sonjoyp"
 else
     home_dir="$HOME"
 fi
@@ -82,13 +82,19 @@ function create_swap_file () {
 			sudo rm ${swap_file}
 
 			echo "Create a file, ~/swapfile, with size ${SWAP_PARTITION_SIZE} as swap device."
-			sudo fallocate -l ${SWAP_PARTITION_SIZE} ${swap_file}
+			if ! sudo fallocate -l ${SWAP_PARTITION_SIZE} ${swap_file}
+			then
+			sudo dd if=/dev/zero of=${swap_file} bs=4K count=3M
+			fi
 			sudo chmod 600 ${swap_file}
 		fi
 	else
 		# not exit, create a swapfile
 		echo "Create a file, ~/swapfile, with size ${SWAP_PARTITION_SIZE} as swap device."
-		sudo fallocate -l ${SWAP_PARTITION_SIZE} ${swap_file}
+		if ! sudo fallocate -l ${SWAP_PARTITION_SIZE} ${swap_file}
+		then
+    		sudo dd if=/dev/zero of=${swap_file} bs=4K count=3M
+		fi
 		sudo chmod 600 ${swap_file}
 		du -sh ${swap_file}
 	fi

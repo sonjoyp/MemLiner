@@ -12,6 +12,7 @@ struct rswap_scheduler *global_rswap_scheduler = NULL;
 
 int rswap_vqueue_init(struct rswap_vqueue *vqueue)
 {
+	pr_info("CPU_Server_Start---------:rswap_vqueue_init------\n");
 	if (!vqueue) {
 		return -EINVAL;
 	}
@@ -31,12 +32,13 @@ int rswap_vqueue_init(struct rswap_vqueue *vqueue)
 
 	// debug
 	vqueue->rid = 0;
-
+	pr_info("CPU_Server_END---------:rswap_vqueue_init------\n");
 	return 0;
 }
 
 int rswap_vqueue_enqueue(struct rswap_vqueue *vqueue, struct rswap_request *request)
 {
+	pr_info("CPU_Server_Start---------:rswap_vqueue_enqueue------\n");
 	unsigned long flags;
 	int cnt;
 	if (!vqueue || !request) {
@@ -99,6 +101,7 @@ int rswap_vqueue_enqueue(struct rswap_vqueue *vqueue, struct rswap_request *requ
 
 int rswap_vqueue_dequeue(struct rswap_vqueue *vqueue, struct rswap_request *request)
 {
+	pr_info("CPU_Server_Start---------:rswap_vqueue_dequeue------\n");
 	unsigned long flags;
 	int cnt;
 	if (!vqueue || !request) {
@@ -123,20 +126,23 @@ int rswap_vqueue_dequeue(struct rswap_vqueue *vqueue, struct rswap_request *requ
 		spin_unlock_irqrestore(&vqueue->lock, flags);
 		return 0;
 	}
-
+	pr_info("CPU_Server_END---------:rswap_vqueue_dequeue------\n");
 	return 0;
 }
 
 int rswap_vqueue_drain(struct rswap_vqueue *vqueue)
 {
+	pr_info("CPU_Server_Start---------:rswap_vqueue_drain------\n");
 	while (atomic_read(&vqueue->cnt) > 0) {
 		cpu_relax();
 	}
+	pr_info("CPU_Server_END---------:rswap_vqueue_drain------\n");
 	return 0;
 }
 
 int rswap_vqueue_list_init(void)
 {
+	pr_info("CPU_Server_Start---------:rswap_vqueue_list_init------\n");
 	struct rswap_vqueue_list *vqlist;
 
 	if (!global_rswap_vqueue_list) {
@@ -154,12 +160,13 @@ int rswap_vqueue_list_init(void)
 	vqlist->max_id = 0;
 	spin_lock_init(&vqlist->lock);
 	INIT_LIST_HEAD(&vqlist->vqlist_head);
-
+	pr_info("CPU_Server_END---------:rswap_vqueue_list_init------\n");
 	return 0;
 }
 
 struct rswap_vqueue *rswap_vqueue_list_get(struct rswap_vqueue_list *vqlist, int qid)
 {
+	pr_info("CPU_Server_Start---------:rswap_vqueue_list_get------\n");
 	unsigned long flags;
 	struct rswap_vqueue *pos, *tmp;
 
@@ -183,11 +190,14 @@ struct rswap_vqueue *rswap_vqueue_list_get(struct rswap_vqueue_list *vqlist, int
 	if (pos->id == qid) {
 		return pos;
 	}
+
+	pr_info("CPU_Server_END---------:rswap_vqueue_list_get------\n");
 	return NULL;
 }
 
 int rswap_vqueue_list_add(struct rswap_vqueue_list *vqlist, struct rswap_vqueue *vqueue)
 {
+	pr_info("CPU_Server_Start---------:rswap_vqueue_list_add------\n");
 	unsigned long flags;
 	if (!vqlist || !vqueue) {
 		return -EINVAL;
@@ -202,11 +212,12 @@ int rswap_vqueue_list_add(struct rswap_vqueue_list *vqlist, struct rswap_vqueue 
 	vqlist->max_id++;
 	vqlist->cnt++;
 	spin_unlock_irqrestore(&vqlist->lock, flags);
-
+	pr_info("CPU_Server_END---------:rswap_vqueue_list_add------\n");
 	return 0;
 }
 int rswap_vqueue_list_del(struct rswap_vqueue_list *vqlist, struct rswap_vqueue *vqueue)
 {
+	pr_info("CPU_Server_Start---------:rswap_vqueue_list_del------\n");
 	unsigned long flags;
 	if (!vqlist || !vqueue) {
 		return -EINVAL;
@@ -217,11 +228,13 @@ int rswap_vqueue_list_del(struct rswap_vqueue_list *vqlist, struct rswap_vqueue 
 	vqlist->cnt--;
 	spin_unlock_irqrestore(&vqlist->lock, flags);
 
+	pr_info("CPU_Server_END---------:rswap_vqueue_list_del------\n");
 	return 0;
 }
 
 int rswap_register_virtual_queue(struct rswap_vqueue_list *vqlist, int *qid)
 {
+	pr_info("CPU_Server_Start---------:rswap_register_virtual_queue------\n");
 	int ret = 0;
 	struct rswap_vqueue *vqueue;
 	if (!vqlist || !qid) {
@@ -237,11 +250,13 @@ int rswap_register_virtual_queue(struct rswap_vqueue_list *vqlist, int *qid)
 	}
 	*qid = vqueue->id;
 
+	pr_info("CPU_Server_END---------:rswap_register_virtual_queue------\n");
 	return ret;
 }
 
 int rswap_unregister_virtual_queue(struct rswap_vqueue_list *vqlist, int qid)
 {
+	pr_info("CPU_Server_Start---------:rswap_unregister_virtual_queue------\n");
 	int ret = 0;
 	struct rswap_vqueue *vqueue;
 	if (!vqlist || qid < 0 || qid >= vqlist->max_id) {
@@ -252,11 +267,14 @@ int rswap_unregister_virtual_queue(struct rswap_vqueue_list *vqlist, int qid)
 	if (vqueue) {
 		ret = rswap_vqueue_list_del(vqlist, vqueue);
 	}
+
+	pr_info("CPU_Server_END---------:rswap_unregister_virtual_queue------\n");
 	return ret;
 }
 
 int rswap_scheduler_init(struct rdma_session_context *rdma_session)
 {
+	pr_info("CPU_Server_Start---------:rswap_scheduler_init------\n");
 	int ret = 0;
 	int fake_qid;
 	const int online_cores = num_online_cpus();
@@ -285,6 +303,8 @@ int rswap_scheduler_init(struct rdma_session_context *rdma_session)
 	kthread_bind(global_rswap_scheduler->scher_thd, 7);
 	wake_up_process(global_rswap_scheduler->scher_thd);
 	pr_info("%s launches scheduler thd.\n", __func__);
+
+	pr_info("CPU_Server_END---------:rswap_scheduler_init------\n");
 	return 0;
 cleanup:
 	pr_info("%s, line %d error.\n", __func__, __LINE__);
@@ -295,22 +315,26 @@ cleanup:
 			print_err(ret);
 		}
 	}
+	pr_info("CPU_Server_END-Cleanup---------:rswap_scheduler_init------\n");
 	return ret;
 }
 
 int rswap_scheduler_stop(void)
 {
+	pr_info("CPU_Server_Start---------:rswap_scheduler_stop------\n");
 	int ret = 0;
 	if (!global_rswap_scheduler) {
 		return -EINVAL;
 	}
 	ret = kthread_stop(global_rswap_scheduler->scher_thd);
 	pr_info("%s, line %d, after kthread stop\n", __func__, __LINE__);
+	pr_info("CPU_Server_END---------:rswap_scheduler_stop------\n");
 	return ret;
 }
 
 int rswap_scheduler_thread(void *args)
 {
+	pr_info("CPU_Server_Start---------:rswap_scheduler_thread------\n");
 	struct rswap_vqueue_list *vqlist;
 	struct rdma_session_context *rdma_session;
 	const unsigned online_cores = num_online_cpus();
@@ -413,5 +437,6 @@ int rswap_scheduler_thread(void *args)
 		cond_resched();
 	}
 
+	pr_info("CPU_Server_END---------:rswap_scheduler_thread------\n");
 	return 0;
 }
