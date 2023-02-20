@@ -141,7 +141,7 @@ void init_memory_pool(struct context *rdma_ctx)
 	rdma_ctx->mem_pool = (struct rdma_mem_pool *)calloc(1, sizeof(struct rdma_mem_pool));
 
 	// heap buffer as swap partition
-	size_t heap_size = ONE_GB * REGION_SIZE_GB * RDMA_DATA_REGION_NUM; // 64GB
+	size_t heap_size = ONE_GB * REGION_SIZE_GB * RDMA_DATA_REGION_NUM; // 12GB
 	void *heap_start = malloc(heap_size);
 	print_debug(stderr, "%s, Register Semeru Space: 0x%llx, size : 0x%llx. \n", __func__,
 		(unsigned long long)heap_start,

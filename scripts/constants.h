@@ -20,13 +20,13 @@
 #ifdef RDMA_DATA_REGION_NUM
 #undef RDMA_DATA_REGION_NUM
 #endif
-#define RDMA_DATA_REGION_NUM 12
+#define RDMA_DATA_REGION_NUM 3
 
 
 #ifdef MAX_FREE_MEM_GB
 #undef MAX_FREE_MEM_GB
 #endif
-#define MAX_FREE_MEM_GB ((size_t)48) // Up to 48GB swap space
+#define MAX_FREE_MEM_GB ((size_t)12) // Up to 48GB swap space
 
 
 #ifdef MAX_REGION_NUM
