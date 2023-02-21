@@ -2,7 +2,7 @@
 #include "rswap_dram.h"
 
 #define ONEGB (1024UL * 1024 * 1024)
-#define REMOTE_BUF_SIZE (ONEGB * 12) /* must match what server is allocating */
+#define REMOTE_BUF_SIZE (ONEGB * 32) /* must match what server is allocating */
 
 static void *local_dram; // a buffer created via vzalloc
 
