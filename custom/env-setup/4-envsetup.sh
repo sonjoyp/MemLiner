@@ -1,6 +1,8 @@
 #! /bin/bash
 # Script 4 - Only for CPU server
 cd ~
+sudo apt update
+echo Y | sudo apt install python-pip
 sudo pip install gdown
 gdown https://drive.google.com/uc?id=1-KOdc2NrquiA5vLk5b-f0Eua8hfM9IWO
 tar zxvf jdk-12.0.2_linux-x64_bin.tar.gz
